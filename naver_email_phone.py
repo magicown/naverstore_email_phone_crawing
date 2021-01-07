@@ -69,6 +69,8 @@ cnt = 0
 # pg.confirm('데이터를 수집합니다.')
 # app = QApplication(sys.argv)
 # ex = MyApp()
+prog_cnt = 1
+rem_cnt = 0
 searchList = []
 for key_text in kw :
     words = parse.quote_plus(key_text)   
@@ -79,6 +81,7 @@ for key_text in kw :
 
     #전체 페이지 갯수를 만든다.
     total_cnt = make_total_page(soup)
+    rem_cnt = total_cnt
     print("전체갯수 : "+str(total_cnt))
     
     start = 1
@@ -133,13 +136,20 @@ for key_text in kw :
                             text = text.replace('고객센터: ','')
                             text = text.replace('인증잘못된 번호 신고','')
                         
-                            temp.append(key_text)
-                            temp.append(email)
-                            temp.append(text)
-                            searchList.append(temp)
+                            # temp.append(key_text)
+                            # temp.append(email)
+                            # temp.append(text)
+                            # searchList.append(temp)
 
+                            print('진행갯수 : '+str(prog_cnt) +  ' / 남은갯수 : '+str(total_cnt-prog_cnt) +' --  '+email + ' : ' + text)
+
+
+                            f = open('storeSaveEmailPhone.csv','a',encoding='utf-8', newline='')
+                            csvWriter = csv.writer(f)                            
+                            csvWriter.writerow([key_text,email,text])
+                            f.close()
                             # print(searchList)
-                            print(email + ' : ' + text)
+                            
 
                             # return email, text
                         except :
@@ -147,15 +157,12 @@ for key_text in kw :
                         
                         
                         k += 1
+                        prog_cnt += 1
                        
             cnt += 1
             start += 1
             
-f = open(f'{keyword}.csv','w',encoding='utf-8', newline='')
-csvWriter = csv.writer(f)
-for i in searchList :
-    csvWriter.writerow(i)
-f.close()
+
 pg.alert('데이터 수집이 완료되었습니다.')
 
 # pyinstaller --nowindowed --add-binary="chromedriver.exe";"." naver_email_phone.py
